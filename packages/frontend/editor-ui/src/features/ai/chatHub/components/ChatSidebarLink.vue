@@ -74,35 +74,53 @@ defineSlots<{
 .menuItem {
 	display: flex;
 	align-items: center;
-	border-radius: var(--spacing--4xs);
+	border-radius: 12px;
 	padding-right: 0;
+	margin-bottom: 2px;
+	border: 1px solid transparent;
+	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
-	&:focus-within,
-	&:has([aria-expanded='true']),
+	&:hover:not(.active) {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(255, 255, 255, 0.1);
+	}
+
 	&.active,
-	&:hover {
-		background-color: var(--color--background--light-1);
+	&:focus-within,
+	&:has([aria-expanded='true']) {
+		background: linear-gradient(
+			135deg,
+			rgba(255, 255, 255, 0.12) 0%,
+			rgba(255, 255, 255, 0.04) 100%
+		);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		box-shadow:
+			0 4px 20px -2px rgba(0, 0, 0, 0.5),
+			inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+			0 0 16px -4px rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(16px);
 	}
 }
 
 .menuItemLink {
 	display: flex;
 	align-items: center;
-	padding: var(--spacing--4xs);
-	gap: var(--spacing--4xs);
+	padding: 8px 10px;
+	gap: 10px;
 	cursor: pointer;
-	color: var(--color--text);
+	color: #cbd5e1;
 	min-width: 0;
 	flex: 1;
 	text-decoration: none;
 	outline: none;
 
 	&.compact {
-		margin-left: -1px;
+		padding: 8px;
+		justify-content: center;
 	}
 
 	&:active {
-		color: var(--color--text--shade-1);
+		color: #fff;
 	}
 }
 
@@ -110,6 +128,7 @@ defineSlots<{
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
+	gap: 1px;
 }
 
 .label {
@@ -117,8 +136,11 @@ defineSlots<{
 	text-overflow: ellipsis;
 	overflow: hidden;
 	flex: 1;
-	line-height: var(--line-height--xl);
+	line-height: 1.2;
 	min-width: 0;
+	color: #94a3b8;
+	font-size: 11px;
+	font-weight: 500;
 }
 
 .title {
@@ -126,8 +148,11 @@ defineSlots<{
 	text-overflow: ellipsis;
 	overflow: hidden;
 	flex: 1;
-	line-height: 20px;
+	line-height: 1.3;
 	min-width: 0;
+	color: #f1f5f9;
+	font-size: 13px;
+	font-weight: 500;
 }
 
 .actionDropdown {
@@ -135,6 +160,7 @@ defineSlots<{
 	flex-shrink: 0;
 	width: 0;
 	overflow: hidden;
+	transition: opacity 0.2s ease;
 
 	.menuItem:has([aria-expanded='true']) &,
 	.menuItem:has(:focus) &,
@@ -148,5 +174,10 @@ defineSlots<{
 .actionDropdownTrigger {
 	box-shadow: none !important;
 	outline: none !important;
+	color: #94a3b8 !important;
+
+	&:hover {
+		color: #fff !important;
+	}
 }
 </style>
