@@ -767,7 +767,7 @@ onBeforeUnmount(() => {
 	display: flex;
 	align-items: center;
 	width: 320px;
-	background: #ffffff;
+	background: #fff;
 	border: 1px solid #e2e8f0;
 	border-radius: 20px;
 	padding: 6px 14px;
@@ -816,7 +816,7 @@ onBeforeUnmount(() => {
 	width: 36px;
 	height: 36px;
 	border-radius: 50%;
-	background: #ffffff;
+	background: #fff;
 	border: 1px solid #e2e8f0;
 	color: #64748b;
 	cursor: pointer;
@@ -849,7 +849,7 @@ onBeforeUnmount(() => {
 	justify-content: center;
 	font-weight: 700;
 	font-size: 13px;
-	color: #ffffff;
+	color: #fff;
 	overflow: hidden;
 }
 
@@ -882,7 +882,7 @@ onBeforeUnmount(() => {
 	font-size: 26px;
 	font-weight: 800;
 	color: #0f172a;
-	margin: 0 0 2px 0;
+	margin: 0 0 2px;
 	letter-spacing: -0.02em;
 }
 
@@ -899,7 +899,7 @@ onBeforeUnmount(() => {
 	font-weight: 600;
 	font-size: 13px;
 	padding: 8px 18px;
-	color: #ffffff;
+	color: #fff;
 	display: flex;
 	align-items: center;
 	gap: 6px;
@@ -926,7 +926,7 @@ onBeforeUnmount(() => {
 }
 
 .kpiCard {
-	background: #ffffff;
+	background: #fff;
 	border-radius: 16px;
 	padding: 20px;
 	display: flex;
@@ -971,13 +971,13 @@ onBeforeUnmount(() => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #ffffff;
+	color: #fff;
 }
 
 .kpiValueFeatured {
 	font-size: 34px;
 	font-weight: 800;
-	color: #ffffff;
+	color: #fff;
 	line-height: 1;
 	margin-bottom: 12px;
 }
@@ -990,7 +990,7 @@ onBeforeUnmount(() => {
 
 .badgePillFeatured {
 	background: #1a533b;
-	color: #ffffff;
+	color: #fff;
 	font-size: 11px;
 	font-weight: 700;
 	padding: 2px 6px;
@@ -1063,7 +1063,7 @@ onBeforeUnmount(() => {
 }
 
 .widgetCard {
-	background: #ffffff;
+	background: #fff;
 	border-radius: 16px;
 	padding: 20px;
 	box-sizing: border-box;
@@ -1161,7 +1161,7 @@ onBeforeUnmount(() => {
 }
 
 .barFillStripedLight {
-	background: repeating-linear-gradient(45deg, #cbd5e1, #cbd5e1 3px, #ffffff 3px, #ffffff 6px);
+	background: repeating-linear-gradient(45deg, #cbd5e1, #cbd5e1 3px, #fff 3px, #fff 6px);
 	border: 1px solid #cbd5e1;
 }
 
@@ -1175,7 +1175,7 @@ onBeforeUnmount(() => {
 	position: absolute;
 	top: 6px;
 	left: 33%;
-	background: #ffffff;
+	background: #fff;
 	border: 1px solid #e2e8f0;
 	border-radius: 12px;
 	padding: 2px 8px;
@@ -1226,7 +1226,7 @@ onBeforeUnmount(() => {
 
 .credBadge {
 	background: #ef4444;
-	color: #ffffff;
+	color: #fff;
 	font-size: 10px;
 	font-weight: 800;
 	width: 16px;
@@ -1488,7 +1488,7 @@ onBeforeUnmount(() => {
 	font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 	font-size: 30px;
 	font-weight: 400;
-	color: #ffffff;
+	color: #fff;
 	letter-spacing: 0.06em;
 }
 
@@ -1504,7 +1504,7 @@ onBeforeUnmount(() => {
 	width: 34px;
 	height: 34px;
 	border-radius: 50%;
-	background: #ffffff;
+	background: #fff;
 	border: none;
 	color: #0e3a2f;
 	display: flex;
@@ -1524,7 +1524,7 @@ onBeforeUnmount(() => {
 	border-radius: 50%;
 	background: #ef4444;
 	border: none;
-	color: #ffffff;
+	color: #fff;
 	display: flex;
 	align-items: center;
 	justify-content: center;
