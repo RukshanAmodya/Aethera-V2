@@ -132,7 +132,7 @@ export const projectsRoutes: RouteRecordRaw[] = [
 		meta: {
 			middleware: ['authenticated'],
 		},
-		redirect: '/home/workflows',
+		redirect: '/home/overview',
 		children: [
 			{
 				name: VIEWS.PROJECT_DETAILS,

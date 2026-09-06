@@ -75,7 +75,7 @@ const home = computed<IMenuItem>(() => ({
 	label: locale.baseText('projects.menu.overview'),
 	icon: 'grid-2x2',
 	route: {
-		to: { name: VIEWS.HOMEPAGE },
+		to: { name: VIEWS.OVERVIEW },
 	},
 }));
 

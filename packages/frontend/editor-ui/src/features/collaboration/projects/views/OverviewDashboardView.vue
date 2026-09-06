@@ -636,7 +636,7 @@ onBeforeUnmount(() => {
 
 	&:hover {
 		background: #1f2937;
-		color: #ffffff;
+		color: #fff;
 	}
 }
 
@@ -658,7 +658,7 @@ onBeforeUnmount(() => {
 	justify-content: center;
 	font-weight: 700;
 	font-size: 13px;
-	color: #ffffff;
+	color: #fff;
 }
 
 .userInfo {
@@ -693,8 +693,8 @@ onBeforeUnmount(() => {
 .pageTitle {
 	font-size: 26px;
 	font-weight: 700;
-	color: #ffffff;
-	margin: 0 0 4px 0;
+	color: #fff;
+	margin: 0 0 4px;
 	letter-spacing: -0.02em;
 }
 
@@ -772,13 +772,13 @@ onBeforeUnmount(() => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #ffffff;
+	color: #fff;
 }
 
 .kpiValueFeatured {
 	font-size: 32px;
 	font-weight: 700;
-	color: #ffffff;
+	color: #fff;
 	line-height: 1;
 	margin-bottom: 12px;
 }
@@ -791,7 +791,7 @@ onBeforeUnmount(() => {
 
 .badgePillFeatured {
 	background: #047857;
-	color: #ffffff;
+	color: #fff;
 	font-size: 11px;
 	font-weight: 700;
 	padding: 2px 8px;
@@ -823,7 +823,7 @@ onBeforeUnmount(() => {
 .kpiValue {
 	font-size: 32px;
 	font-weight: 700;
-	color: #ffffff;
+	color: #fff;
 	line-height: 1;
 	margin-bottom: 12px;
 }
@@ -883,7 +883,7 @@ onBeforeUnmount(() => {
 .widgetTitle {
 	font-size: 15px;
 	font-weight: 600;
-	color: #ffffff;
+	color: #fff;
 }
 
 .moreBtn {
@@ -894,7 +894,7 @@ onBeforeUnmount(() => {
 	padding: 4px;
 
 	&:hover {
-		color: #ffffff;
+		color: #fff;
 	}
 }
 
@@ -981,7 +981,7 @@ onBeforeUnmount(() => {
 .statPercent {
 	font-size: 12px;
 	font-weight: 700;
-	color: #ffffff;
+	color: #fff;
 }
 
 /* Credentials List */
@@ -1201,7 +1201,7 @@ onBeforeUnmount(() => {
 .gaugePercentage {
 	font-size: 24px;
 	font-weight: 700;
-	color: #ffffff;
+	color: #fff;
 	line-height: 1;
 }
 
@@ -1262,7 +1262,7 @@ onBeforeUnmount(() => {
 .serverCardTitle {
 	font-size: 15px;
 	font-weight: 600;
-	color: #ffffff;
+	color: #fff;
 }
 
 .moreBtnInverted {
@@ -1273,7 +1273,7 @@ onBeforeUnmount(() => {
 	padding: 4px;
 
 	&:hover {
-		color: #ffffff;
+		color: #fff;
 	}
 }
 
@@ -1302,7 +1302,7 @@ onBeforeUnmount(() => {
 	font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 	font-size: 28px;
 	font-weight: 700;
-	color: #ffffff;
+	color: #fff;
 	letter-spacing: 0.08em;
 	text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
 }
