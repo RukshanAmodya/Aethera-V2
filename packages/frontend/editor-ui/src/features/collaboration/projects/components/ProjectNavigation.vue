@@ -72,10 +72,10 @@ watch(projectsCollapsed, (val) => localStorage.setItem(PROJECTS_COLLAPSED_KEY, S
 
 const home = computed<IMenuItem>(() => ({
 	id: 'home',
-	label: locale.baseText('projects.menu.overview'),
-	icon: 'grid-2x2',
+	label: locale.baseText('generic.workflows'),
+	icon: 'project-diagram',
 	route: {
-		to: { name: VIEWS.OVERVIEW },
+		to: { name: VIEWS.WORKFLOWS },
 	},
 }));
 
