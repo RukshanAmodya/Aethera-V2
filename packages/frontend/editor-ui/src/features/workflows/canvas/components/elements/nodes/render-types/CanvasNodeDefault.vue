@@ -315,6 +315,29 @@ const nodeCategory = computed(() => {
 	return 'Action';
 });
 
+const categoryClass = computed(() => {
+	switch (nodeCategory.value) {
+		case 'Trigger':
+			return $style.catTrigger;
+		case 'AI Agent':
+			return $style.catAi;
+		case 'Script':
+			return $style.catScript;
+		case 'Logic':
+			return $style.catLogic;
+		case 'Database':
+			return $style.catDatabase;
+		case 'Message':
+			return $style.catMessage;
+		case 'Fields':
+			return $style.catFields;
+		case 'Wait':
+			return $style.catWait;
+		default:
+			return $style.catAction;
+	}
+});
+
 const executionTimeDisplay = computed(() => {
 	if (executionTimeMs.value !== null) {
 		return formatExecutionTime(executionTimeMs.value);
@@ -378,7 +401,7 @@ function onActivate(event: MouseEvent) {
 
 		<!-- Card Content: Header (Icon Box + Titles + Aligned Status Icon) -->
 		<div :class="$style.header">
-			<div :class="$style.iconBox">
+			<div :class="[$style.iconBox, categoryClass]">
 				<NodeIcon
 					:icon-source="iconSource"
 					:size="22"
@@ -404,7 +427,7 @@ function onActivate(event: MouseEvent) {
 		<!-- Card Content: Footer (Left Meta + Right Connected Status) -->
 		<div :class="$style.footer">
 			<div :class="$style.footerLeft">
-				<span :class="$style.categoryBadge">
+				<span :class="[$style.categoryBadge, categoryClass]">
 					<svg
 						:class="$style.timeIcon"
 						width="12"
@@ -451,7 +474,9 @@ function onActivate(event: MouseEvent) {
 	background: #141518;
 	border: 1px solid #2a2c33;
 	border-radius: 22px;
-	box-shadow: 0 16px 32px -4px rgba(0, 0, 0, 0.6), 0 4px 8px -2px rgba(0, 0, 0, 0.4);
+	box-shadow:
+		0 16px 32px -4px rgba(0, 0, 0, 0.6),
+		0 4px 8px -2px rgba(0, 0, 0, 0.4);
 	backdrop-filter: blur(8px);
 	-webkit-backdrop-filter: blur(8px);
 	transition:
@@ -462,12 +487,16 @@ function onActivate(event: MouseEvent) {
 	&:hover {
 		transform: translateY(-2px);
 		border-color: #3f424e;
-		box-shadow: 0 20px 36px -4px rgba(0, 0, 0, 0.7), 0 6px 12px -2px rgba(0, 0, 0, 0.5);
+		box-shadow:
+			0 20px 36px -4px rgba(0, 0, 0, 0.7),
+			0 6px 12px -2px rgba(0, 0, 0, 0.5);
 	}
 
 	&.selected {
 		border-color: #ff4d6d;
-		box-shadow: 0 0 0 2px #ff4d6d, 0 16px 32px -4px rgba(255, 77, 109, 0.25);
+		box-shadow:
+			0 0 0 2px #ff4d6d,
+			0 16px 32px -4px rgba(255, 77, 109, 0.25);
 	}
 
 	&.running {
@@ -498,14 +527,150 @@ function onActivate(event: MouseEvent) {
 	width: 44px;
 	height: 44px;
 	border-radius: 12px;
-	background: #202228;
-	border: 1px solid rgba(255, 255, 255, 0.06);
+	background: #1e2027;
+	border: 1px solid rgba(255, 255, 255, 0.08);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex-shrink: 0;
 	color: #fff;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	position: relative;
+	overflow: hidden;
+
+	/* Vibrancy & contrast for dark mode icons */
+	img,
+	svg {
+		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+	}
+
+	/* Category Distinct Styling for Icon Badges */
+	&.catTrigger {
+		background: radial-gradient(
+			circle at top left,
+			rgba(6, 182, 212, 0.28),
+			rgba(20, 24, 33, 0.95)
+		);
+		border: 1px solid rgba(6, 182, 212, 0.4);
+		box-shadow:
+			0 4px 14px rgba(6, 182, 212, 0.2),
+			0 0 0 1px rgba(6, 182, 212, 0.15) inset;
+		--canvas-node--icon-color: #38bdf8;
+		color: #38bdf8;
+	}
+
+	&.catAi {
+		background: radial-gradient(
+			circle at top left,
+			rgba(168, 85, 247, 0.3),
+			rgba(24, 20, 36, 0.95)
+		);
+		border: 1px solid rgba(168, 85, 247, 0.45);
+		box-shadow:
+			0 4px 14px rgba(168, 85, 247, 0.25),
+			0 0 0 1px rgba(168, 85, 247, 0.2) inset;
+		--canvas-node--icon-color: #c084fc;
+		color: #c084fc;
+	}
+
+	&.catScript {
+		background: radial-gradient(
+			circle at top left,
+			rgba(234, 179, 8, 0.25),
+			rgba(28, 26, 20, 0.95)
+		);
+		border: 1px solid rgba(234, 179, 8, 0.38);
+		box-shadow:
+			0 4px 14px rgba(234, 179, 8, 0.2),
+			0 0 0 1px rgba(234, 179, 8, 0.15) inset;
+		--canvas-node--icon-color: #facc15;
+		color: #facc15;
+	}
+
+	&.catLogic {
+		background: radial-gradient(
+			circle at top left,
+			rgba(249, 115, 22, 0.25),
+			rgba(30, 22, 18, 0.95)
+		);
+		border: 1px solid rgba(249, 115, 22, 0.38);
+		box-shadow:
+			0 4px 14px rgba(249, 115, 22, 0.2),
+			0 0 0 1px rgba(249, 115, 22, 0.15) inset;
+		--canvas-node--icon-color: #fb923c;
+		color: #fb923c;
+	}
+
+	&.catDatabase {
+		background: radial-gradient(
+			circle at top left,
+			rgba(59, 130, 246, 0.28),
+			rgba(18, 23, 36, 0.95)
+		);
+		border: 1px solid rgba(59, 130, 246, 0.4);
+		box-shadow:
+			0 4px 14px rgba(59, 130, 246, 0.2),
+			0 0 0 1px rgba(59, 130, 246, 0.15) inset;
+		--canvas-node--icon-color: #60a5fa;
+		color: #60a5fa;
+	}
+
+	&.catMessage {
+		background: radial-gradient(
+			circle at top left,
+			rgba(34, 197, 94, 0.25),
+			rgba(18, 28, 22, 0.95)
+		);
+		border: 1px solid rgba(34, 197, 94, 0.38);
+		box-shadow:
+			0 4px 14px rgba(34, 197, 94, 0.2),
+			0 0 0 1px rgba(34, 197, 94, 0.15) inset;
+		--canvas-node--icon-color: #4ade80;
+		color: #4ade80;
+	}
+
+	&.catFields {
+		background: radial-gradient(
+			circle at top left,
+			rgba(236, 72, 153, 0.25),
+			rgba(32, 18, 26, 0.95)
+		);
+		border: 1px solid rgba(236, 72, 153, 0.38);
+		box-shadow:
+			0 4px 14px rgba(236, 72, 153, 0.2),
+			0 0 0 1px rgba(236, 72, 153, 0.15) inset;
+		--canvas-node--icon-color: #f472b6;
+		color: #f472b6;
+	}
+
+	&.catWait {
+		background: radial-gradient(
+			circle at top left,
+			rgba(148, 163, 184, 0.22),
+			rgba(24, 26, 30, 0.95)
+		);
+		border: 1px solid rgba(148, 163, 184, 0.35);
+		box-shadow:
+			0 4px 14px rgba(148, 163, 184, 0.15),
+			0 0 0 1px rgba(148, 163, 184, 0.1) inset;
+		--canvas-node--icon-color: #cbd5e1;
+		color: #cbd5e1;
+	}
+
+	&.catAction {
+		background: radial-gradient(
+			circle at top left,
+			rgba(99, 102, 241, 0.25),
+			rgba(20, 22, 32, 0.95)
+		);
+		border: 1px solid rgba(99, 102, 241, 0.35);
+		box-shadow:
+			0 4px 14px rgba(99, 102, 241, 0.18),
+			0 0 0 1px rgba(99, 102, 241, 0.12) inset;
+		--canvas-node--icon-color: #818cf8;
+		color: #818cf8;
+	}
 }
 
 .titleWrapper {
@@ -566,6 +731,114 @@ function onActivate(event: MouseEvent) {
 	background: #1c1e24;
 	border: 1px solid rgba(255, 255, 255, 0.06);
 	color: #9ca3af;
+
+	&.catTrigger {
+		background: rgba(6, 182, 212, 0.1);
+		border-color: rgba(6, 182, 212, 0.25);
+		color: #38bdf8;
+		.timeIcon {
+			color: #38bdf8;
+		}
+		.categoryLabel {
+			color: #bae6fd;
+		}
+	}
+
+	&.catAi {
+		background: rgba(168, 85, 247, 0.12);
+		border-color: rgba(168, 85, 247, 0.28);
+		color: #c084fc;
+		.timeIcon {
+			color: #c084fc;
+		}
+		.categoryLabel {
+			color: #e9d5ff;
+		}
+	}
+
+	&.catScript {
+		background: rgba(234, 179, 8, 0.1);
+		border-color: rgba(234, 179, 8, 0.25);
+		color: #facc15;
+		.timeIcon {
+			color: #facc15;
+		}
+		.categoryLabel {
+			color: #fef08a;
+		}
+	}
+
+	&.catLogic {
+		background: rgba(249, 115, 22, 0.1);
+		border-color: rgba(249, 115, 22, 0.25);
+		color: #fb923c;
+		.timeIcon {
+			color: #fb923c;
+		}
+		.categoryLabel {
+			color: #fed7aa;
+		}
+	}
+
+	&.catDatabase {
+		background: rgba(59, 130, 246, 0.1);
+		border-color: rgba(59, 130, 246, 0.25);
+		color: #60a5fa;
+		.timeIcon {
+			color: #60a5fa;
+		}
+		.categoryLabel {
+			color: #bfdbfe;
+		}
+	}
+
+	&.catMessage {
+		background: rgba(34, 197, 94, 0.1);
+		border-color: rgba(34, 197, 94, 0.25);
+		color: #4ade80;
+		.timeIcon {
+			color: #4ade80;
+		}
+		.categoryLabel {
+			color: #bbf7d0;
+		}
+	}
+
+	&.catFields {
+		background: rgba(236, 72, 153, 0.1);
+		border-color: rgba(236, 72, 153, 0.25);
+		color: #f472b6;
+		.timeIcon {
+			color: #f472b6;
+		}
+		.categoryLabel {
+			color: #fbcfe8;
+		}
+	}
+
+	&.catWait {
+		background: rgba(148, 163, 184, 0.1);
+		border-color: rgba(148, 163, 184, 0.2);
+		color: #94a3b8;
+		.timeIcon {
+			color: #94a3b8;
+		}
+		.categoryLabel {
+			color: #cbd5e1;
+		}
+	}
+
+	&.catAction {
+		background: rgba(99, 102, 241, 0.1);
+		border-color: rgba(99, 102, 241, 0.22);
+		color: #818cf8;
+		.timeIcon {
+			color: #818cf8;
+		}
+		.categoryLabel {
+			color: #c7d2fe;
+		}
+	}
 }
 
 .timeIcon {
