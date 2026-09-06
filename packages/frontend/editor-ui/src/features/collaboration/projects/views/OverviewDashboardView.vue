@@ -1178,7 +1178,7 @@ onBeforeUnmount(() => {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	background: #ffffff;
+	background: #fff;
 	border: 1px solid #e2e8f0;
 	border-radius: 12px;
 	padding: 8px 16px;
@@ -1199,12 +1199,12 @@ onBeforeUnmount(() => {
 .navTabActive {
 	background: #0e3a2f;
 	border-color: #0e3a2f;
-	color: #ffffff;
+	color: #fff;
 
 	&:hover {
 		background: #082820;
 		border-color: #082820;
-		color: #ffffff;
+		color: #fff;
 	}
 
 	.navTabIcon {

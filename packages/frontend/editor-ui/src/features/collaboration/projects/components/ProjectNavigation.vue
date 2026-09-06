@@ -79,15 +79,6 @@ const home = computed<IMenuItem>(() => ({
 	},
 }));
 
-const shared = computed<IMenuItem>(() => ({
-	id: 'shared',
-	label: locale.baseText('projects.menu.shared'),
-	icon: 'share',
-	route: {
-		to: { name: VIEWS.SHARED_WITH_ME },
-	},
-}));
-
 const getProjectMenuItem = (project: ProjectListItem): IMenuItem => ({
 	id: project.id,
 	label: project.name ?? '',
@@ -99,18 +90,6 @@ const getProjectMenuItem = (project: ProjectListItem): IMenuItem => ({
 		},
 	},
 });
-
-const personalProject = computed<IMenuItem>(() => ({
-	id: projectsStore.personalProject?.id ?? '',
-	label: locale.baseText('projects.menu.personal'),
-	icon: 'arrow-left-right',
-	route: {
-		to: {
-			name: VIEWS.PROJECTS_WORKFLOWS,
-			params: { projectId: projectsStore.personalProject?.id },
-		},
-	},
-}));
 
 const hasFavorites = computed(() => favoritesStore.favorites.length > 0);
 
