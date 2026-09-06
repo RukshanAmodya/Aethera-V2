@@ -10,6 +10,7 @@ import { useInsightsStore } from '@/features/execution/insights';
 import { useUIStore } from '@/app/stores/ui.store';
 import { CREDENTIAL_SELECT_MODAL_KEY } from '@/features/credentials/credentials.constants';
 import { VIEWS } from '@/app/constants';
+import CredentialIcon from '@/features/credentials/components/CredentialIcon.vue';
 
 const router = useRouter();
 const workflowsStore = useWorkflowsListStore();
@@ -21,6 +22,20 @@ const uiStore = useUIStore();
 
 // Search state
 const searchQuery = ref('');
+
+// Dialog Modals State
+const activeModal = ref<'credentials' | 'workflows' | 'executions' | null>(null);
+const modalSearchQuery = ref('');
+
+function openModalView(type: 'credentials' | 'workflows' | 'executions') {
+	modalSearchQuery.value = '';
+	activeModal.value = type;
+}
+
+function closeModalView() {
+	activeModal.value = null;
+	modalSearchQuery.value = '';
+}
 
 // Current user display
 const userName = computed(() => {
@@ -130,15 +145,16 @@ const workflowIcons = [
 	{ icon: 'globe', bg: '#f5f3ff', color: '#8b5cf6' },
 ];
 
-const workflowItems = computed(() => {
+const allRealWorkflows = computed(() => {
 	const realList = workflowsStore.allWorkflows;
 	if (realList && realList.length > 0) {
-		return realList.slice(0, 5).map((w, index) => {
+		return realList.map((w, index) => {
 			const iconCfg = workflowIcons[index % workflowIcons.length];
 			return {
 				id: w.id,
 				name: w.name,
 				date: `Last Update : ${formatCreatedDate(w.updatedAt || Date.now())}, 2026`,
+				active: w.active,
 				icon: iconCfg.icon,
 				iconBg: iconCfg.bg,
 				iconColor: iconCfg.color,
@@ -150,6 +166,7 @@ const workflowItems = computed(() => {
 			id: '1',
 			name: 'Advanced Manual If-Else 20 Nodes ...',
 			date: 'Last Update : Sep 6, 2026',
+			active: true,
 			icon: 'code',
 			iconBg: '#eff6ff',
 			iconColor: '#3b82f6',
@@ -158,6 +175,7 @@ const workflowItems = computed(() => {
 			id: '2',
 			name: 'Onboarding Flow',
 			date: 'Last Update : Sep 6, 2026',
+			active: true,
 			icon: 'clock',
 			iconBg: '#ecfdf5',
 			iconColor: '#10b981',
@@ -166,6 +184,7 @@ const workflowItems = computed(() => {
 			id: '3',
 			name: 'Build Dashboard',
 			date: 'Last Update : Sep 6, 2026',
+			active: false,
 			icon: 'grid-2x2',
 			iconBg: '#fffbeb',
 			iconColor: '#f59e0b',
@@ -174,6 +193,7 @@ const workflowItems = computed(() => {
 			id: '4',
 			name: 'Optimize Page Load',
 			date: 'Last Update : Sep 6, 2026',
+			active: true,
 			icon: 'zap',
 			iconBg: '#fff1f2',
 			iconColor: '#f43f5e',
@@ -182,6 +202,7 @@ const workflowItems = computed(() => {
 			id: '5',
 			name: 'Cross-Browser Testing',
 			date: 'Last Update : Sep 6, 2026',
+			active: false,
 			icon: 'globe',
 			iconBg: '#f5f3ff',
 			iconColor: '#8b5cf6',
@@ -189,11 +210,21 @@ const workflowItems = computed(() => {
 	];
 });
 
-// Credentials list (Dynamic real credentials with edit modal openers)
-const credentialItems = computed(() => {
+const workflowItems = computed(() => {
+	return allRealWorkflows.value.slice(0, 5);
+});
+
+const modalFilteredWorkflows = computed(() => {
+	const query = modalSearchQuery.value.trim().toLowerCase();
+	if (!query) return allRealWorkflows.value;
+	return allRealWorkflows.value.filter((w) => w.name.toLowerCase().includes(query));
+});
+
+// Credentials list (Dynamic real credentials with CredentialIcon)
+const allRealCredentials = computed(() => {
 	const list = credentialsStore.allCredentials;
 	if (list && list.length > 0) {
-		return list.slice(0, 3).map((c) => ({
+		return list.map((c) => ({
 			id: c.id,
 			name: c.name,
 			type: c.type,
@@ -207,25 +238,42 @@ const credentialItems = computed(() => {
 			name: 'Groq Account',
 			timeAgo: '1h ago',
 			createdDate: 'Sep 6',
-			type: 'groq',
-			count: 9,
+			type: 'groqApi',
 		},
-		{ id: 'c2', name: 'OpenAI Account', timeAgo: '2h ago', createdDate: 'Sep 3', type: 'openai' },
+		{
+			id: 'c2',
+			name: 'OpenAI Account',
+			timeAgo: '2h ago',
+			createdDate: 'Sep 3',
+			type: 'openAiApi',
+		},
 		{
 			id: 'c3',
 			name: 'Deepseek Account',
 			timeAgo: '10h ago',
 			createdDate: 'Sep 1',
-			type: 'deepseek',
+			type: 'deepSeekApi',
 		},
 	];
 });
 
+const credentialItems = computed(() => {
+	return allRealCredentials.value.slice(0, 3);
+});
+
+const modalFilteredCredentials = computed(() => {
+	const query = modalSearchQuery.value.trim().toLowerCase();
+	if (!query) return allRealCredentials.value;
+	return allRealCredentials.value.filter(
+		(c) => c.name.toLowerCase().includes(query) || c.type.toLowerCase().includes(query),
+	);
+});
+
 // Executions list (Dynamic real executions with execution viewer openers)
-const executionItems = computed(() => {
+const allRealExecutions = computed(() => {
 	const list = executionsStore.allExecutions;
 	if (list && list.length > 0) {
-		return list.slice(0, 5).map((e) => ({
+		return list.map((e) => ({
 			id: e.id,
 			workflowId: e.workflowId,
 			name: e.workflowName || 'Advanced Manual If-Else 20 Nodes',
@@ -236,35 +284,52 @@ const executionItems = computed(() => {
 	return [
 		{
 			id: 'e1',
+			workflowId: '1',
 			name: 'Advanced Manual If-Else 20 Nodes',
 			status: 'Success',
 			time: 'Sep 6, 15:21:12',
 		},
 		{
 			id: 'e2',
-			name: 'Advanced Manual If-Else 20 Nodes',
+			workflowId: '2',
+			name: 'Onboarding Flow Execution',
 			status: 'Success',
-			time: 'Sep 6, 15:21:12',
+			time: 'Sep 6, 15:10:04',
 		},
 		{
 			id: 'e3',
-			name: 'Advanced Manual If-Else 20 Nodes',
-			status: 'Success',
-			time: 'Sep 6, 15:21:12',
+			workflowId: '3',
+			name: 'Build Dashboard Test',
+			status: 'Failed',
+			time: 'Sep 6, 14:45:30',
 		},
 		{
 			id: 'e4',
-			name: 'Advanced Manual If-Else 20 Nodes',
+			workflowId: '4',
+			name: 'Optimize Page Load Webhook',
 			status: 'Success',
-			time: 'Sep 6, 15:21:12',
+			time: 'Sep 6, 13:20:18',
 		},
 		{
 			id: 'e5',
-			name: 'Advanced Manual If-Else 20 Nodes',
+			workflowId: '5',
+			name: 'Cross-Browser Testing Run',
 			status: 'Success',
-			time: 'Sep 6, 15:21:12',
+			time: 'Sep 6, 12:05:52',
 		},
 	];
+});
+
+const executionItems = computed(() => {
+	return allRealExecutions.value.slice(0, 5);
+});
+
+const modalFilteredExecutions = computed(() => {
+	const query = modalSearchQuery.value.trim().toLowerCase();
+	if (!query) return allRealExecutions.value;
+	return allRealExecutions.value.filter(
+		(e) => e.name.toLowerCase().includes(query) || e.status.toLowerCase().includes(query),
+	);
 });
 
 // Live Server Runtime Clock (Days:Hours:Minutes:Seconds)
@@ -300,50 +365,41 @@ function resetTimer() {
 }
 
 function onAddWorkflow() {
+	closeModalView();
 	void router.push({ name: VIEWS.NEW_WORKFLOW });
 }
 
 function onNewCredential() {
+	closeModalView();
 	uiStore.openModal(CREDENTIAL_SELECT_MODAL_KEY);
 }
 
 function openWorkflow(id: string) {
+	closeModalView();
 	if (id && id.length > 3) {
 		void router.push({ name: VIEWS.WORKFLOW, params: { name: id } });
 	} else {
-		void router.push({ name: VIEWS.WORKFLOWS });
+		void router.push({ name: VIEWS.NEW_WORKFLOW });
 	}
 }
 
 function openCredentialItem(id: string) {
+	closeModalView();
 	if (id && id.length > 3 && !id.startsWith('c')) {
 		uiStore.openExistingCredential(id);
 	} else {
-		void router.push({ name: VIEWS.CREDENTIALS });
+		uiStore.openModal(CREDENTIAL_SELECT_MODAL_KEY);
 	}
 }
 
 function openExecutionItem(item: any) {
+	closeModalView();
 	if (item.workflowId && item.id) {
 		void router.push({
 			name: VIEWS.EXECUTION_PREVIEW,
 			params: { name: item.workflowId, executionId: item.id },
 		});
-	} else {
-		void router.push({ name: VIEWS.EXECUTIONS });
 	}
-}
-
-function navigateToWorkflows() {
-	void router.push({ name: VIEWS.WORKFLOWS });
-}
-
-function navigateToCredentials() {
-	void router.push({ name: VIEWS.CREDENTIALS });
-}
-
-function navigateToExecutions() {
-	void router.push({ name: VIEWS.EXECUTIONS });
 }
 
 function navigateToInsights() {
@@ -447,7 +503,7 @@ onBeforeUnmount(() => {
 						<N8nIcon icon="arrow-up-right" size="small" />
 					</div>
 				</div>
-				<div :class="$style.kpiValue">{{ failureRate }}</div>
+				<div :class="$style.kpiValue">{{ failureRate }}%</div>
 				<div :class="$style.kpiBadge">
 					<span :class="$style.badgePill">2 &uarr;</span>
 					<span :class="$style.badgeText">Increased from last month</span>
@@ -462,7 +518,7 @@ onBeforeUnmount(() => {
 						<N8nIcon icon="arrow-up-right" size="small" />
 					</div>
 				</div>
-				<div :class="$style.kpiValue">{{ timeSaved }}</div>
+				<div :class="$style.kpiValue">{{ timeSaved }}h</div>
 				<div :class="$style.kpiBadge">
 					<span :class="$style.badgeTextMuted">On Discuss</span>
 				</div>
@@ -548,6 +604,12 @@ onBeforeUnmount(() => {
 			<div :class="$style.widgetCard">
 				<div :class="$style.widgetHeader">
 					<span :class="$style.widgetTitle">Credentials</span>
+					<div :class="$style.headerActionsSmall">
+						<button :class="$style.viewAllBtn" @click="openModalView('credentials')">
+							View All
+						</button>
+						<button :class="$style.newBadgeBtn" @click="onNewCredential">+ New</button>
+					</div>
 				</div>
 				<div :class="$style.credentialsList">
 					<div
@@ -556,17 +618,12 @@ onBeforeUnmount(() => {
 						:class="$style.credentialRow"
 						@click="openCredentialItem(item.id)"
 					>
+						<div :class="$style.credIconContainer">
+							<CredentialIcon :credential-type-name="item.type" :size="24" />
+						</div>
 						<div :class="$style.credMain">
 							<div :class="$style.credTopRow">
 								<span :class="$style.credName">{{ item.name }}</span>
-								<span v-if="item.count" :class="$style.credBadge">{{ item.count }}</span>
-								<N8nIcon
-									v-else-if="item.type === 'openai'"
-									icon="sparkles"
-									size="small"
-									:class="$style.credIconSparkle"
-								/>
-								<N8nIcon v-else icon="key" size="small" :class="$style.credIconGeneric" />
 							</div>
 							<div :class="$style.credMetaRow">
 								<span>Last Update : {{ item.timeAgo }}</span>
@@ -582,7 +639,10 @@ onBeforeUnmount(() => {
 			<div :class="[$style.widgetCard, $style.workflowsWidget]">
 				<div :class="$style.widgetHeader">
 					<span :class="$style.widgetTitle">Workflows</span>
-					<button :class="$style.newBadgeBtn" @click="onAddWorkflow">+ New</button>
+					<div :class="$style.headerActionsSmall">
+						<button :class="$style.viewAllBtn" @click="openModalView('workflows')">View All</button>
+						<button :class="$style.newBadgeBtn" @click="onAddWorkflow">+ New</button>
+					</div>
 				</div>
 				<div :class="$style.workflowsList">
 					<div
@@ -612,6 +672,7 @@ onBeforeUnmount(() => {
 			<div :class="$style.widgetCard">
 				<div :class="$style.widgetHeader">
 					<span :class="$style.widgetTitle">Executions</span>
+					<button :class="$style.viewAllBtn" @click="openModalView('executions')">View All</button>
 				</div>
 				<div :class="$style.executionsList">
 					<div
@@ -736,6 +797,154 @@ onBeforeUnmount(() => {
 				</div>
 			</div>
 		</div>
+
+		<!-- Dialog Popups for Sections (Credentials / Workflows / Executions) -->
+		<div v-if="activeModal" :class="$style.modalBackdrop" @click.self="closeModalView">
+			<div :class="$style.modalContainer">
+				<div :class="$style.modalHeader">
+					<div :class="$style.modalTitleBox">
+						<h2 :class="$style.modalTitle">
+							{{
+								activeModal === 'credentials'
+									? 'All Credentials'
+									: activeModal === 'workflows'
+										? 'All Workflows'
+										: 'All Executions'
+							}}
+						</h2>
+						<p :class="$style.modalSubtitle">
+							{{
+								activeModal === 'credentials'
+									? 'Manage and search through your authenticated credentials'
+									: activeModal === 'workflows'
+										? 'Quickly find, run, and edit your project workflows'
+										: 'View historical executions, execution logs, and statuses'
+							}}
+						</p>
+					</div>
+					<button :class="$style.modalCloseBtn" @click="closeModalView">
+						<N8nIcon icon="times" size="medium" />
+					</button>
+				</div>
+
+				<!-- Search Input in Dialog -->
+				<div :class="$style.modalSearchBar">
+					<N8nIcon icon="search" size="medium" :class="$style.modalSearchIcon" />
+					<input
+						v-model="modalSearchQuery"
+						type="text"
+						:placeholder="`Search ${activeModal}...`"
+						:class="$style.modalSearchInput"
+					/>
+					<button
+						v-if="activeModal === 'credentials'"
+						:class="$style.modalActionBtn"
+						@click="onNewCredential"
+					>
+						+ New Credential
+					</button>
+					<button
+						v-else-if="activeModal === 'workflows'"
+						:class="$style.modalActionBtn"
+						@click="onAddWorkflow"
+					>
+						+ New Workflow
+					</button>
+				</div>
+
+				<!-- Modal Content Body -->
+				<div :class="$style.modalBody">
+					<!-- Credentials List Modal -->
+					<div v-if="activeModal === 'credentials'" :class="$style.modalListGrid">
+						<div
+							v-for="item in modalFilteredCredentials"
+							:key="item.id"
+							:class="$style.modalItemCard"
+							@click="openCredentialItem(item.id)"
+						>
+							<div :class="$style.modalItemIconContainer">
+								<CredentialIcon :credential-type-name="item.type" :size="32" />
+							</div>
+							<div :class="$style.modalItemInfo">
+								<span :class="$style.modalItemName">{{ item.name }}</span>
+								<span :class="$style.modalItemMeta">
+									Type: {{ item.type }} &bull; Updated {{ item.timeAgo }} &bull; Created
+									{{ item.createdDate }}
+								</span>
+							</div>
+							<N8nIcon icon="chevron-right" size="small" :class="$style.modalItemArrow" />
+						</div>
+						<div v-if="modalFilteredCredentials.length === 0" :class="$style.emptyModal">
+							No credentials found
+						</div>
+					</div>
+
+					<!-- Workflows List Modal -->
+					<div v-else-if="activeModal === 'workflows'" :class="$style.modalListGrid">
+						<div
+							v-for="wf in modalFilteredWorkflows"
+							:key="wf.id"
+							:class="$style.modalItemCard"
+							@click="openWorkflow(wf.id)"
+						>
+							<div
+								:class="$style.wfIconBox"
+								:style="{
+									backgroundColor: wf.iconBg,
+									color: wf.iconColor,
+									width: '38px',
+									height: '38px',
+								}"
+							>
+								<N8nIcon :icon="wf.icon" size="medium" />
+							</div>
+							<div :class="$style.modalItemInfo">
+								<span :class="$style.modalItemName">{{ wf.name }}</span>
+								<span :class="$style.modalItemMeta">{{ wf.date }}</span>
+							</div>
+							<div :class="$style.modalItemRight">
+								<span :class="[wf.active ? $style.badgeActive : $style.badgeInactive]">
+									{{ wf.active ? 'Active' : 'Inactive' }}
+								</span>
+								<N8nIcon icon="chevron-right" size="small" :class="$style.modalItemArrow" />
+							</div>
+						</div>
+						<div v-if="modalFilteredWorkflows.length === 0" :class="$style.emptyModal">
+							No workflows found
+						</div>
+					</div>
+
+					<!-- Executions List Modal -->
+					<div v-else-if="activeModal === 'executions'" :class="$style.modalListGrid">
+						<div
+							v-for="ex in modalFilteredExecutions"
+							:key="ex.id"
+							:class="$style.modalItemCard"
+							@click="openExecutionItem(ex)"
+						>
+							<div :class="$style.modalItemInfo">
+								<span :class="$style.modalItemName">{{ ex.name }}</span>
+								<span :class="$style.modalItemMeta">{{ ex.time }} &bull; ID: {{ ex.id }}</span>
+							</div>
+							<div :class="$style.modalItemRight">
+								<span
+									:class="[
+										$style.exStatusPill,
+										ex.status === 'Failed' ? $style.exStatusPillFailed : '',
+									]"
+								>
+									{{ ex.status }}
+								</span>
+								<N8nIcon icon="chevron-right" size="small" :class="$style.modalItemArrow" />
+							</div>
+						</div>
+						<div v-if="modalFilteredExecutions.length === 0" :class="$style.emptyModal">
+							No executions found
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -807,6 +1016,28 @@ onBeforeUnmount(() => {
 	display: flex;
 	align-items: center;
 	gap: 12px;
+}
+
+.headerActionsSmall {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.viewAllBtn {
+	background: transparent;
+	border: none;
+	color: #0e3a2f;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 2px 6px;
+	border-radius: 6px;
+
+	&:hover {
+		background: #f1f5f9;
+		text-decoration: underline;
+	}
 }
 
 .iconButton {
@@ -1197,13 +1428,26 @@ onBeforeUnmount(() => {
 
 .credentialRow {
 	display: flex;
-	flex-direction: column;
+	align-items: center;
+	gap: 12px;
 	padding: 4px 0;
 	cursor: pointer;
 
 	&:hover .credName {
 		color: #0e3a2f;
 	}
+}
+
+.credIconContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	background: #f8fafc;
+	border: 1px solid #f1f5f9;
+	flex-shrink: 0;
 }
 
 .credMain {
@@ -1222,27 +1466,6 @@ onBeforeUnmount(() => {
 	font-size: 14px;
 	font-weight: 700;
 	color: #0f172a;
-}
-
-.credBadge {
-	background: #ef4444;
-	color: #fff;
-	font-size: 10px;
-	font-weight: 800;
-	width: 16px;
-	height: 16px;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.credIconSparkle {
-	color: #0f172a;
-}
-
-.credIconGeneric {
-	color: #2563eb;
 }
 
 .credMetaRow {
@@ -1534,5 +1757,235 @@ onBeforeUnmount(() => {
 	&:hover {
 		transform: scale(1.08);
 	}
+}
+
+/* Modal Backdrop & Dialog Box */
+.modalBackdrop {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(15, 23, 42, 0.45);
+	backdrop-filter: blur(4px);
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+}
+
+.modalContainer {
+	background: #fff;
+	border-radius: 20px;
+	width: 100%;
+	max-width: 680px;
+	max-height: 85vh;
+	display: flex;
+	flex-direction: column;
+	box-shadow:
+		0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+	border: 1px solid #e2e8f0;
+	overflow: hidden;
+	animation: modalSlideUp 0.2s ease-out;
+}
+
+@keyframes modalSlideUp {
+	from {
+		opacity: 0;
+		transform: translateY(12px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.modalHeader {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	padding: 20px 24px 16px;
+	border-bottom: 1px solid #f1f5f9;
+}
+
+.modalTitleBox {
+	display: flex;
+	flex-direction: column;
+}
+
+.modalTitle {
+	font-size: 18px;
+	font-weight: 800;
+	color: #0f172a;
+	margin: 0;
+}
+
+.modalSubtitle {
+	font-size: 12px;
+	color: #64748b;
+	margin: 4px 0 0;
+}
+
+.modalCloseBtn {
+	background: transparent;
+	border: none;
+	color: #94a3b8;
+	cursor: pointer;
+	padding: 4px;
+	border-radius: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&:hover {
+		background: #f1f5f9;
+		color: #0f172a;
+	}
+}
+
+.modalSearchBar {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 24px;
+	background: #f8fafc;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+.modalSearchIcon {
+	color: #94a3b8;
+}
+
+.modalSearchInput {
+	flex: 1;
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	padding: 8px 12px;
+	font-size: 13px;
+	color: #0f172a;
+	outline: none;
+
+	&:focus {
+		border-color: #0e3a2f;
+	}
+}
+
+.modalActionBtn {
+	background: #0e3a2f;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 8px 14px;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+
+	&:hover {
+		background: #082820;
+	}
+}
+
+.modalBody {
+	padding: 16px 24px 24px;
+	overflow-y: auto;
+	flex: 1;
+}
+
+.modalListGrid {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.modalItemCard {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 12px 16px;
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+
+	&:hover {
+		border-color: #0e3a2f;
+		background: #f8fafc;
+		transform: translateY(-1px);
+	}
+}
+
+.modalItemIconContainer {
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f1f5f9;
+	border-radius: 10px;
+	flex-shrink: 0;
+}
+
+.modalItemInfo {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-width: 0;
+}
+
+.modalItemName {
+	font-size: 14px;
+	font-weight: 700;
+	color: #0f172a;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.modalItemMeta {
+	font-size: 11px;
+	color: #64748b;
+	margin-top: 2px;
+}
+
+.modalItemRight {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.modalItemArrow {
+	color: #cbd5e1;
+}
+
+.badgeActive {
+	background: #f0fdf4;
+	color: #16a34a;
+	border: 1px solid #bbf7d0;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 8px;
+	border-radius: 6px;
+}
+
+.badgeInactive {
+	background: #f1f5f9;
+	color: #64748b;
+	border: 1px solid #e2e8f0;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 8px;
+	border-radius: 6px;
+}
+
+.emptyModal {
+	text-align: center;
+	padding: 32px 0;
+	color: #94a3b8;
+	font-size: 13px;
 }
 </style>
