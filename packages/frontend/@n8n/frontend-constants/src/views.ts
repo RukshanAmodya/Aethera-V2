@@ -19,6 +19,7 @@
  */
 export enum VIEWS {
 	HOMEPAGE = 'Homepage',
+	OVERVIEW = 'OverviewDashboardView',
 	COLLECTION = 'TemplatesCollectionView',
 	EXECUTIONS = 'Executions',
 	EXECUTION_PREVIEW = 'ExecutionPreview',

@@ -53,7 +53,7 @@ defineExpose({
 	:global(> .button) {
 		background: #ff6d5a !important;
 		border-color: #ff6d5a !important;
-		color: #ffffff !important;
+		color: #fff !important;
 		font-weight: 600;
 
 		&:hover {
@@ -78,7 +78,7 @@ defineExpose({
 	border-radius: 0 9999px 9999px 0 !important;
 	background: #ff6d5a !important;
 	border-color: #ff6d5a !important;
-	color: #ffffff !important;
+	color: #fff !important;
 
 	&:hover {
 		background: #e85642 !important;

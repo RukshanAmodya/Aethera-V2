@@ -259,7 +259,7 @@ onMounted(() => {
 .historySections {
 	display: flex;
 	flex-direction: column;
-	padding: 8px 8px;
+	padding: 8px;
 	gap: 16px;
 
 	&.collapsed {
@@ -275,7 +275,7 @@ onMounted(() => {
 }
 
 .groupHeader {
-	padding: 0 8px 6px 8px;
+	padding: 0 8px 6px;
 	color: #94a3b8;
 	font-size: 11px;
 	font-weight: 600;

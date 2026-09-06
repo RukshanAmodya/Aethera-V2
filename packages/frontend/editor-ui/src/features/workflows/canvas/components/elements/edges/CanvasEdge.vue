@@ -260,10 +260,7 @@ function onEdgeLabelMouseLeave() {
 	// Using !important here to override BaseEdge styles after Rolldown Vite migration
 	stroke: var(
 		--canvas-edge--color,
-		light-dark(
-			oklch(var(--canvas-edge--color--lightness--light) 0 0),
-			#252830
-		)
+		light-dark(oklch(var(--canvas-edge--color--lightness--light) 0 0), #252830)
 	) !important;
 	/* stylelint-disable-next-line @n8n/css-var-naming */
 	stroke-width: calc(2.2px * var(--canvas-zoom-compensation-factor, 1)) !important;
@@ -297,12 +294,12 @@ function onEdgeLabelMouseLeave() {
 
 .runningCorePulse {
 	fill: none;
-	stroke: #ffffff;
+	stroke: #fff;
 	/* stylelint-disable-next-line @n8n/css-var-naming */
 	stroke-width: calc(1.8px * var(--canvas-zoom-compensation-factor, 1));
 	stroke-linecap: round;
 	stroke-dasharray: 6 94;
-	filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #38bdf8);
+	filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 8px #38bdf8);
 	pointer-events: none;
 	animation: flowingCoreData 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }

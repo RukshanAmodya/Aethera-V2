@@ -687,7 +687,7 @@ function onActivate(event: MouseEvent) {
 	font-weight: 500;
 	letter-spacing: -0.01em;
 	line-height: 1.25;
-	color: #ffffff;
+	color: #fff;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;

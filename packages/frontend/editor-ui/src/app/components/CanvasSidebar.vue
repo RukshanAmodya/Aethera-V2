@@ -109,11 +109,7 @@ function onToggleAssistant() {
 		<div :class="$style.toolPanel">
 			<!-- Aethera Brand Logo / Back Button -->
 			<KeyboardShortcutTooltip :label="i18n.baseText('generic.back') || 'Back to Projects'">
-				<button
-					type="button"
-					:class="[$style.toolBtn, $style.backButton]"
-					@click="goBack"
-				>
+				<button type="button" :class="[$style.toolBtn, $style.backButton]" @click="goBack">
 					<img :src="aetheraIcon" alt="Back" :class="$style.brandIcon" />
 					<span :class="$style.backArrowOverlay">
 						<N8nIcon icon="chevron-left" size="medium" />
@@ -156,7 +152,10 @@ function onToggleAssistant() {
 			</KeyboardShortcutTooltip>
 
 			<!-- Tidy Up / Auto Arrange -->
-			<KeyboardShortcutTooltip label="Tidy Up" :shortcut="{ shiftKey: true, altKey: true, keys: ['T'] }">
+			<KeyboardShortcutTooltip
+				label="Tidy Up"
+				:shortcut="{ shiftKey: true, altKey: true, keys: ['T'] }"
+			>
 				<button type="button" :class="[$style.toolBtn, $style.tidyBtn]" @click="onTidyUp">
 					<TidyUpIcon />
 				</button>
@@ -217,7 +216,9 @@ function onToggleAssistant() {
 	border-radius: 20px;
 	background: #14151a;
 	border: 1px solid rgba(255, 255, 255, 0.08);
-	box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.4);
+	box-shadow:
+		0 12px 32px -4px rgba(0, 0, 0, 0.65),
+		0 2px 8px rgba(0, 0, 0, 0.4);
 	backdrop-filter: blur(16px);
 	-webkit-backdrop-filter: blur(16px);
 }
@@ -251,7 +252,7 @@ function onToggleAssistant() {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #ffffff;
+	color: #fff;
 	opacity: 0;
 	transform: scale(1.3);
 	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -272,7 +273,7 @@ function onToggleAssistant() {
 
 	&:hover {
 		background: #20232d;
-		color: #ffffff;
+		color: #fff;
 		border-color: rgba(255, 255, 255, 0.08);
 		transform: translateY(-1px);
 	}

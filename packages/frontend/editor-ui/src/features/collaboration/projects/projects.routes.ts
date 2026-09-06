@@ -7,6 +7,7 @@ import { hasRole } from '@/app/utils/rbac/checks';
 import { useSettingsStore } from '@n8n/stores/settings.store';
 
 const WorkflowsView = async () => await import('@/app/views/WorkflowsView.vue');
+const OverviewDashboardView = async () => await import('./views/OverviewDashboardView.vue');
 const CredentialsView = async () =>
 	await import('@/features/credentials/views/CredentialsView.vue');
 const ProjectSettings = async () => await import('./views/ProjectSettings.vue');
@@ -179,7 +180,7 @@ export const projectsRoutes: RouteRecordRaw[] = [
 		meta: {
 			middleware: ['authenticated'],
 		},
-		redirect: '/home/workflows',
+		redirect: '/home/overview',
 		beforeEnter: (_to, _from, next) => {
 			const settingsStore = useSettingsStore();
 			if (settingsStore.isChatFeatureEnabled && hasRole(['global:chatUser'])) {
@@ -194,11 +195,21 @@ export const projectsRoutes: RouteRecordRaw[] = [
 
 			next();
 		},
-		children: commonChildRoutes.map((route, idx) => ({
-			...route,
-			name: commonChildRouteExtensions.home[idx].name,
-			middleware: ['authenticated'],
-		})),
+		children: [
+			{
+				path: 'overview',
+				name: VIEWS.OVERVIEW,
+				component: OverviewDashboardView,
+				meta: {
+					middleware: ['authenticated'],
+				},
+			},
+			...commonChildRoutes.map((route, idx) => ({
+				...route,
+				name: commonChildRouteExtensions.home[idx].name,
+				middleware: ['authenticated'],
+			})),
+		],
 	},
 	{
 		path: '/shared',
