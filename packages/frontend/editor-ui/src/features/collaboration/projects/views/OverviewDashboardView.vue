@@ -309,16 +309,33 @@ const projectProgressData = computed(() => {
 	};
 });
 
-// Server Runtime Clock: Real session & live uptime timer
-const sessionStartTime =
-	Date.now() - (window.performance && performance.now ? Math.floor(performance.now()) : 0);
+// Server Runtime Clock: Real server uptime timer from backend
+const serverStartTime = ref<number>(Date.now());
 const serverTime = ref('00:00:00:00');
 const isTimerPaused = ref(false);
 let timerInterval: any = null;
 
+async function fetchServerUptime() {
+	try {
+		const res = await fetch('/rest/debug/multi-main-setup');
+		if (res.ok) {
+			const data = await res.json();
+			if (data.startTime) {
+				serverStartTime.value = data.startTime;
+			} else if (data.uptime) {
+				serverStartTime.value = Date.now() - Math.floor(data.uptime * 1000);
+			}
+		}
+	} catch {
+		// Fallback to client session start time
+		serverStartTime.value =
+			Date.now() - (window.performance && performance.now ? Math.floor(performance.now()) : 0);
+	}
+}
+
 function updateClock() {
 	if (isTimerPaused.value) return;
-	const diffSec = Math.floor((Date.now() - sessionStartTime) / 1000);
+	const diffSec = Math.max(0, Math.floor((Date.now() - serverStartTime.value) / 1000));
 	const d = Math.floor(diffSec / 86400)
 		.toString()
 		.padStart(2, '0');
@@ -339,6 +356,7 @@ function togglePause() {
 }
 
 function resetTimer() {
+	serverStartTime.value = Date.now();
 	serverTime.value = '00:00:00:00';
 }
 
@@ -380,7 +398,12 @@ function navigateToInsights() {
 	void router.push({ name: VIEWS.INSIGHTS });
 }
 
+function navigateToTab(routeName: string) {
+	void router.push({ name: routeName });
+}
+
 onMounted(async () => {
+	await fetchServerUptime();
 	updateClock();
 	timerInterval = setInterval(updateClock, 1000);
 	try {
@@ -432,14 +455,53 @@ onBeforeUnmount(() => {
 			</div>
 		</header>
 
-		<!-- Main Page Banner / Title -->
+		<!-- Main Page Banner / Title & Navigation Tabs -->
 		<div :class="$style.titleBar">
 			<div>
 				<h1 :class="$style.pageTitle">Dashboard</h1>
 				<p :class="$style.pageSubtitle">Plan, prioritize, and accomplish your tasks with ease.</p>
 			</div>
-			<button :class="$style.addWorkflowBtn" @click="onAddWorkflow">
-				<span :class="$style.btnPlus">+</span> Add Workflow
+			<div :class="$style.titleActions">
+				<button :class="$style.addWorkflowBtn" @click="onAddWorkflow">
+					<span :class="$style.btnPlus">+</span> Add Workflow
+				</button>
+			</div>
+		</div>
+
+		<!-- Quick Navigation Hub Bar (Workflows, Credentials, Executions, Variables, Data tables) -->
+		<div :class="$style.quickNavHub">
+			<button :class="[$style.navTabBtn, $style.navTabActive]">
+				<N8nIcon icon="grid-2x2" size="small" :class="$style.navTabIcon" />
+				<span>Overview</span>
+			</button>
+			<button :class="$style.navTabBtn" @click="navigateToTab(VIEWS.WORKFLOWS)">
+				<N8nIcon icon="project-diagram" size="small" :class="$style.navTabIcon" />
+				<span>Workflows</span>
+				<span v-if="allRealWorkflows.length > 0" :class="$style.navTabCount">{{
+					allRealWorkflows.length
+				}}</span>
+			</button>
+			<button :class="$style.navTabBtn" @click="navigateToTab(VIEWS.CREDENTIALS)">
+				<N8nIcon icon="key" size="small" :class="$style.navTabIcon" />
+				<span>Credentials</span>
+				<span v-if="allRealCredentials.length > 0" :class="$style.navTabCount">{{
+					allRealCredentials.length
+				}}</span>
+			</button>
+			<button :class="$style.navTabBtn" @click="navigateToTab(VIEWS.EXECUTIONS)">
+				<N8nIcon icon="history" size="small" :class="$style.navTabIcon" />
+				<span>Executions</span>
+				<span v-if="allRealExecutions.length > 0" :class="$style.navTabCount">{{
+					allRealExecutions.length
+				}}</span>
+			</button>
+			<button :class="$style.navTabBtn" @click="navigateToTab(VIEWS.HOME_VARIABLES)">
+				<N8nIcon icon="variable" size="small" :class="$style.navTabIcon" />
+				<span>Variables</span>
+			</button>
+			<button :class="$style.navTabBtn" @click="navigateToTab('data-tables')">
+				<N8nIcon icon="table" size="small" :class="$style.navTabIcon" />
+				<span>Data tables</span>
 			</button>
 		</div>
 
@@ -1079,7 +1141,13 @@ onBeforeUnmount(() => {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-bottom: 24px;
+	margin-bottom: 16px;
+}
+
+.titleActions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
 .pageTitle {
@@ -1094,6 +1162,69 @@ onBeforeUnmount(() => {
 	font-size: 13px;
 	color: #64748b;
 	margin: 0;
+}
+
+/* Quick Navigation Hub Bar */
+.quickNavHub {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 24px;
+	overflow-x: auto;
+	padding-bottom: 4px;
+}
+
+.navTabBtn {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 8px 16px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #475569;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	white-space: nowrap;
+
+	&:hover {
+		background: #f8fafc;
+		border-color: #cbd5e1;
+		color: #0f172a;
+	}
+}
+
+.navTabActive {
+	background: #0e3a2f;
+	border-color: #0e3a2f;
+	color: #ffffff;
+
+	&:hover {
+		background: #082820;
+		border-color: #082820;
+		color: #ffffff;
+	}
+
+	.navTabIcon {
+		color: #34d399;
+	}
+}
+
+.navTabIcon {
+	color: #64748b;
+	display: flex;
+	align-items: center;
+}
+
+.navTabCount {
+	background: rgba(0, 0, 0, 0.08);
+	color: inherit;
+	font-size: 11px;
+	font-weight: 700;
+	padding: 1px 6px;
+	border-radius: 10px;
 }
 
 .addWorkflowBtn {

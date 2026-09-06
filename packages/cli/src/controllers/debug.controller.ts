@@ -35,6 +35,8 @@ export class DebugController {
 				triggersAndPollers, // non-webhook trigger active workflows
 			},
 			activationErrors,
+			uptime: process.uptime(),
+			startTime: Date.now() - Math.floor(process.uptime() * 1000),
 		};
 	}
 }
