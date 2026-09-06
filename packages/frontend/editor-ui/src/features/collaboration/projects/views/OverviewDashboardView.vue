@@ -43,11 +43,11 @@ const userName = computed(() => {
 	if (user?.firstName || user?.lastName) {
 		return `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
 	}
-	return 'Totok Michael';
+	return user?.email?.split('@')[0] || 'User';
 });
 
 const userEmail = computed(() => {
-	return usersStore.currentUser?.email ?? 'tmichael20@gmail.com';
+	return usersStore.currentUser?.email ?? '';
 });
 
 const userInitials = computed(() => {
@@ -56,10 +56,10 @@ const userInitials = computed(() => {
 	if (parts.length >= 2) {
 		return (parts[0][0] + parts[1][0]).toUpperCase();
 	}
-	return name.slice(0, 2).toUpperCase() || 'TM';
+	return name.slice(0, 2).toUpperCase() || 'U';
 });
 
-// Helper for relative / short time display
+// Helpers
 function formatRelativeTime(dateInput?: string | Date | number): string {
 	if (!dateInput) return 'Just now';
 	const date = new Date(dateInput);
@@ -72,13 +72,13 @@ function formatRelativeTime(dateInput?: string | Date | number): string {
 }
 
 function formatCreatedDate(dateInput?: string | Date | number): string {
-	if (!dateInput) return 'Sep 6';
+	if (!dateInput) return '';
 	const date = new Date(dateInput);
 	return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function formatFullDateTime(dateInput?: string | Date | number): string {
-	if (!dateInput) return 'Sep 6, 15:21:12';
+	if (!dateInput) return '';
 	const date = new Date(dateInput);
 	const month = date.toLocaleDateString('en-US', { month: 'short' });
 	const day = date.getDate();
@@ -88,55 +88,46 @@ function formatFullDateTime(dateInput?: string | Date | number): string {
 	return `${month} ${day}, ${hours}:${mins}:${secs}`;
 }
 
-// KPIs Metrics from insights / executions store
+// Real KPI Metrics
 const totalExecutions = computed(() => {
-	if (
-		insightsStore.weeklySummary.data?.total?.value !== undefined &&
-		insightsStore.weeklySummary.data?.total?.value > 0
-	) {
+	if (insightsStore.weeklySummary.data?.total?.value !== undefined) {
 		return insightsStore.weeklySummary.data.total.value;
 	}
-	return executionsStore.allExecutions.length > 0 ? executionsStore.allExecutions.length : 24;
+	return executionsStore.allExecutions.length;
 });
 
 const failedExecutions = computed(() => {
-	if (
-		insightsStore.weeklySummary.data?.failed?.value !== undefined &&
-		insightsStore.weeklySummary.data?.failed?.value > 0
-	) {
+	if (insightsStore.weeklySummary.data?.failed?.value !== undefined) {
 		return insightsStore.weeklySummary.data.failed.value;
 	}
-	const count = executionsStore.allExecutions.filter(
-		(e) => e.status === 'error' || e.status === 'crashed',
-	).length;
-	return count > 0 ? count : 10;
+	return executionsStore.allExecutions.filter((e) => e.status === 'error' || e.status === 'crashed')
+		.length;
 });
 
 const failureRate = computed(() => {
-	if (
-		insightsStore.weeklySummary.data?.failureRate?.value !== undefined &&
-		insightsStore.weeklySummary.data?.failureRate?.value > 0
-	) {
+	if (insightsStore.weeklySummary.data?.failureRate?.value !== undefined) {
 		return `${insightsStore.weeklySummary.data.failureRate.value}`;
 	}
-	if (executionsStore.allExecutions.length > 0) {
-		const rate = Math.round((failedExecutions.value / executionsStore.allExecutions.length) * 100);
-		return `${rate}`;
+	if (totalExecutions.value > 0) {
+		return `${Math.round((failedExecutions.value / totalExecutions.value) * 100)}`;
 	}
-	return '12';
+	return '0';
 });
 
 const timeSaved = computed(() => {
-	if (
-		insightsStore.weeklySummary.data?.timeSaved?.value !== undefined &&
-		insightsStore.weeklySummary.data?.timeSaved?.value > 0
-	) {
+	if (insightsStore.weeklySummary.data?.timeSaved?.value !== undefined) {
 		return `${insightsStore.weeklySummary.data.timeSaved.value}`;
 	}
-	return '2';
+	// Estimate 1.5 minutes (0.025h) saved per successful execution
+	const successfulCount = totalExecutions.value - failedExecutions.value;
+	if (successfulCount > 0) {
+		const hours = Math.round((successfulCount * 2) / 60);
+		return `${hours > 0 ? hours : (successfulCount * 0.05).toFixed(1)}`;
+	}
+	return '0';
 });
 
-// Workflows list (Dynamic real workflows with icons and real update dates)
+// Workflows list (100% Real Data)
 const workflowIcons = [
 	{ icon: 'code', bg: '#eff6ff', color: '#3b82f6' },
 	{ icon: 'clock', bg: '#ecfdf5', color: '#10b981' },
@@ -147,67 +138,19 @@ const workflowIcons = [
 
 const allRealWorkflows = computed(() => {
 	const realList = workflowsStore.allWorkflows;
-	if (realList && realList.length > 0) {
-		return realList.map((w, index) => {
-			const iconCfg = workflowIcons[index % workflowIcons.length];
-			return {
-				id: w.id,
-				name: w.name,
-				date: `Last Update : ${formatCreatedDate(w.updatedAt || Date.now())}, 2026`,
-				active: w.active,
-				icon: iconCfg.icon,
-				iconBg: iconCfg.bg,
-				iconColor: iconCfg.color,
-			};
-		});
-	}
-	return [
-		{
-			id: '1',
-			name: 'Advanced Manual If-Else 20 Nodes ...',
-			date: 'Last Update : Sep 6, 2026',
-			active: true,
-			icon: 'code',
-			iconBg: '#eff6ff',
-			iconColor: '#3b82f6',
-		},
-		{
-			id: '2',
-			name: 'Onboarding Flow',
-			date: 'Last Update : Sep 6, 2026',
-			active: true,
-			icon: 'clock',
-			iconBg: '#ecfdf5',
-			iconColor: '#10b981',
-		},
-		{
-			id: '3',
-			name: 'Build Dashboard',
-			date: 'Last Update : Sep 6, 2026',
-			active: false,
-			icon: 'grid-2x2',
-			iconBg: '#fffbeb',
-			iconColor: '#f59e0b',
-		},
-		{
-			id: '4',
-			name: 'Optimize Page Load',
-			date: 'Last Update : Sep 6, 2026',
-			active: true,
-			icon: 'zap',
-			iconBg: '#fff1f2',
-			iconColor: '#f43f5e',
-		},
-		{
-			id: '5',
-			name: 'Cross-Browser Testing',
-			date: 'Last Update : Sep 6, 2026',
-			active: false,
-			icon: 'globe',
-			iconBg: '#f5f3ff',
-			iconColor: '#8b5cf6',
-		},
-	];
+	if (!realList || realList.length === 0) return [];
+	return realList.map((w, index) => {
+		const iconCfg = workflowIcons[index % workflowIcons.length];
+		return {
+			id: w.id,
+			name: w.name,
+			date: `Last Update : ${formatCreatedDate(w.updatedAt || Date.now())}`,
+			active: w.active,
+			icon: iconCfg.icon,
+			iconBg: iconCfg.bg,
+			iconColor: iconCfg.color,
+		};
+	});
 });
 
 const workflowItems = computed(() => {
@@ -220,41 +163,17 @@ const modalFilteredWorkflows = computed(() => {
 	return allRealWorkflows.value.filter((w) => w.name.toLowerCase().includes(query));
 });
 
-// Credentials list (Dynamic real credentials with CredentialIcon)
+// Credentials list (100% Real Data)
 const allRealCredentials = computed(() => {
 	const list = credentialsStore.allCredentials;
-	if (list && list.length > 0) {
-		return list.map((c) => ({
-			id: c.id,
-			name: c.name,
-			type: c.type,
-			timeAgo: formatRelativeTime(c.updatedAt),
-			createdDate: formatCreatedDate(c.createdAt),
-		}));
-	}
-	return [
-		{
-			id: 'c1',
-			name: 'Groq Account',
-			timeAgo: '1h ago',
-			createdDate: 'Sep 6',
-			type: 'groqApi',
-		},
-		{
-			id: 'c2',
-			name: 'OpenAI Account',
-			timeAgo: '2h ago',
-			createdDate: 'Sep 3',
-			type: 'openAiApi',
-		},
-		{
-			id: 'c3',
-			name: 'Deepseek Account',
-			timeAgo: '10h ago',
-			createdDate: 'Sep 1',
-			type: 'deepSeekApi',
-		},
-	];
+	if (!list || list.length === 0) return [];
+	return list.map((c) => ({
+		id: c.id,
+		name: c.name,
+		type: c.type,
+		timeAgo: formatRelativeTime(c.updatedAt),
+		createdDate: formatCreatedDate(c.createdAt),
+	}));
 });
 
 const credentialItems = computed(() => {
@@ -269,55 +188,17 @@ const modalFilteredCredentials = computed(() => {
 	);
 });
 
-// Executions list (Dynamic real executions with execution viewer openers)
+// Executions list (100% Real Data)
 const allRealExecutions = computed(() => {
 	const list = executionsStore.allExecutions;
-	if (list && list.length > 0) {
-		return list.map((e) => ({
-			id: e.id,
-			workflowId: e.workflowId,
-			name: e.workflowName || 'Advanced Manual If-Else 20 Nodes',
-			status: e.status === 'error' || e.status === 'crashed' ? 'Failed' : 'Success',
-			time: formatFullDateTime(e.startedAt || e.createdAt),
-		}));
-	}
-	return [
-		{
-			id: 'e1',
-			workflowId: '1',
-			name: 'Advanced Manual If-Else 20 Nodes',
-			status: 'Success',
-			time: 'Sep 6, 15:21:12',
-		},
-		{
-			id: 'e2',
-			workflowId: '2',
-			name: 'Onboarding Flow Execution',
-			status: 'Success',
-			time: 'Sep 6, 15:10:04',
-		},
-		{
-			id: 'e3',
-			workflowId: '3',
-			name: 'Build Dashboard Test',
-			status: 'Failed',
-			time: 'Sep 6, 14:45:30',
-		},
-		{
-			id: 'e4',
-			workflowId: '4',
-			name: 'Optimize Page Load Webhook',
-			status: 'Success',
-			time: 'Sep 6, 13:20:18',
-		},
-		{
-			id: 'e5',
-			workflowId: '5',
-			name: 'Cross-Browser Testing Run',
-			status: 'Success',
-			time: 'Sep 6, 12:05:52',
-		},
-	];
+	if (!list || list.length === 0) return [];
+	return list.map((e) => ({
+		id: e.id,
+		workflowId: e.workflowId,
+		name: e.workflowName || 'Workflow Execution',
+		status: e.status === 'error' || e.status === 'crashed' ? 'Failed' : 'Success',
+		time: formatFullDateTime(e.startedAt || e.createdAt),
+	}));
 });
 
 const executionItems = computed(() => {
@@ -332,15 +213,112 @@ const modalFilteredExecutions = computed(() => {
 	);
 });
 
-// Live Server Runtime Clock (Days:Hours:Minutes:Seconds)
-const startTime = Date.now() - (24 * 24 * 3600 + 1 * 3600 + 24 * 60 + 8) * 1000;
-const serverTime = ref('24:01:24:08');
+// Real Analytics per Day of Week (Sun=0 to Sat=6)
+const dayActivityStats = computed(() => {
+	const counts = [
+		{ day: 'S', count: 0, label: 'Sunday', updated: 0, created: 0 },
+		{ day: 'M', count: 0, label: 'Monday', updated: 0, created: 0 },
+		{ day: 'T', count: 0, label: 'Tuesday', updated: 0, created: 0 },
+		{ day: 'W', count: 0, label: 'Wednesday', updated: 0, created: 0 },
+		{ day: 'T', count: 0, label: 'Thursday', updated: 0, created: 0 },
+		{ day: 'F', count: 0, label: 'Friday', updated: 0, created: 0 },
+		{ day: 'S', count: 0, label: 'Saturday', updated: 0, created: 0 },
+	];
+
+	// Count real executions & workflow events by day of week
+	executionsStore.allExecutions.forEach((e) => {
+		if (e.createdAt || e.startedAt) {
+			const d = new Date(e.createdAt || e.startedAt).getDay();
+			counts[d].count += 1;
+		}
+	});
+
+	workflowsStore.allWorkflows.forEach((w) => {
+		if (w.updatedAt) {
+			const d = new Date(w.updatedAt).getDay();
+			counts[d].count += 1;
+			counts[d].updated += 1;
+		}
+		if (w.createdAt) {
+			const d = new Date(w.createdAt).getDay();
+			counts[d].created += 1;
+		}
+	});
+
+	const maxCount = Math.max(...counts.map((c) => c.count), 1);
+	return counts.map((item, idx) => {
+		const pct = item.count > 0 ? Math.max(Math.round((item.count / maxCount) * 90), 15) : 8;
+		let styleClass = 'barFillGreen';
+		if (item.count === 0) {
+			styleClass = 'barFillFlatLight';
+		} else if (item.updated > 0) {
+			styleClass = 'barFillStripedLight';
+		} else if (idx === 3 || idx === 1) {
+			styleClass = 'barFillDarkGreen';
+		} else {
+			styleClass = 'barFillMint';
+		}
+		return {
+			...item,
+			height: `${pct}%`,
+			styleClass,
+		};
+	});
+});
+
+const overallActivityRate = computed(() => {
+	if (totalExecutions.value === 0 && workflowsStore.allWorkflows.length === 0) {
+		return '0%';
+	}
+	const successRate = 100 - Number(failureRate.value || 0);
+	return `${Math.max(successRate, 10)}%`;
+});
+
+// Real Project Progress (Active vs Inactive workflows)
+const projectProgressData = computed(() => {
+	const total = workflowsStore.allWorkflows.length;
+	if (total === 0) {
+		return {
+			percentage: 0,
+			completedCount: 0,
+			inProgressCount: 0,
+			arcPath: 'M 20 80 A 60 60 0 0 1 20 80',
+		};
+	}
+	const activeCount = workflowsStore.allWorkflows.filter((w) => w.active).length;
+	const inactiveCount = total - activeCount;
+	const pct = Math.round((activeCount / total) * 100);
+
+	// Angle for semi-circle arc: from PI (180deg - left) to (PI - angle)
+	const angle = (pct / 100) * Math.PI;
+	const cx = 80;
+	const cy = 80;
+	const r = 60;
+	const x = cx - r * Math.cos(angle);
+	const y = cy - r * Math.sin(angle);
+	const arcPath =
+		pct > 0
+			? `M 20 80 A 60 60 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}`
+			: 'M 20 80 A 60 60 0 0 1 20 80';
+
+	return {
+		percentage: pct,
+		completedCount: activeCount,
+		inProgressCount: inactiveCount,
+		arcPath,
+	};
+});
+
+// Server Runtime Clock: Real session & live uptime timer
+const sessionStartTime =
+	Date.now() - (window.performance && performance.now ? Math.floor(performance.now()) : 0);
+const serverTime = ref('00:00:00:00');
 const isTimerPaused = ref(false);
 let timerInterval: any = null;
 
 function updateClock() {
 	if (isTimerPaused.value) return;
-	const diffSec = Math.floor((Date.now() - startTime) / 1000);
+	const diffSec = Math.floor((Date.now() - sessionStartTime) / 1000);
 	const d = Math.floor(diffSec / 86400)
 		.toString()
 		.padStart(2, '0');
@@ -376,19 +354,15 @@ function onNewCredential() {
 
 function openWorkflow(id: string) {
 	closeModalView();
-	if (id && id.length > 3) {
+	if (id) {
 		void router.push({ name: VIEWS.WORKFLOW, params: { name: id } });
-	} else {
-		void router.push({ name: VIEWS.NEW_WORKFLOW });
 	}
 }
 
 function openCredentialItem(id: string) {
 	closeModalView();
-	if (id && id.length > 3 && !id.startsWith('c')) {
+	if (id) {
 		uiStore.openExistingCredential(id);
-	} else {
-		uiStore.openModal(CREDENTIAL_SELECT_MODAL_KEY);
 	}
 }
 
@@ -407,6 +381,7 @@ function navigateToInsights() {
 }
 
 onMounted(async () => {
+	updateClock();
 	timerInterval = setInterval(updateClock, 1000);
 	try {
 		await Promise.allSettled([
@@ -428,7 +403,12 @@ onBeforeUnmount(() => {
 		<header :class="$style.topHeader">
 			<div :class="$style.searchWrapper">
 				<N8nIcon icon="search" size="medium" :class="$style.searchIcon" />
-				<input v-model="searchQuery" type="text" placeholder="Search" :class="$style.searchInput" />
+				<input
+					v-model="searchQuery"
+					type="text"
+					placeholder="Search..."
+					:class="$style.searchInput"
+				/>
 				<kbd :class="$style.searchShortcut">⌘ K</kbd>
 			</div>
 
@@ -446,7 +426,7 @@ onBeforeUnmount(() => {
 					</div>
 					<div :class="$style.userInfo">
 						<span :class="$style.userName">{{ userName }}</span>
-						<span :class="$style.userEmail">{{ userEmail }}</span>
+						<span v-if="userEmail" :class="$style.userEmail">{{ userEmail }}</span>
 					</div>
 				</div>
 			</div>
@@ -475,8 +455,8 @@ onBeforeUnmount(() => {
 				</div>
 				<div :class="$style.kpiValueFeatured">{{ totalExecutions }}</div>
 				<div :class="$style.kpiBadgeFeatured">
-					<span :class="$style.badgePillFeatured">5 &uarr;</span>
-					<span :class="$style.badgeTextFeatured">Increased from last month</span>
+					<span :class="$style.badgePillFeatured">{{ totalExecutions }} Total</span>
+					<span :class="$style.badgeTextFeatured">All recorded executions</span>
 				</div>
 			</div>
 
@@ -490,8 +470,8 @@ onBeforeUnmount(() => {
 				</div>
 				<div :class="$style.kpiValue">{{ failedExecutions }}</div>
 				<div :class="$style.kpiBadge">
-					<span :class="$style.badgePill">6 &uarr;</span>
-					<span :class="$style.badgeText">Increased from last month</span>
+					<span :class="$style.badgePill">{{ failedExecutions }} Error</span>
+					<span :class="$style.badgeText">Failed or crashed runs</span>
 				</div>
 			</div>
 
@@ -505,8 +485,8 @@ onBeforeUnmount(() => {
 				</div>
 				<div :class="$style.kpiValue">{{ failureRate }}%</div>
 				<div :class="$style.kpiBadge">
-					<span :class="$style.badgePill">2 &uarr;</span>
-					<span :class="$style.badgeText">Increased from last month</span>
+					<span :class="$style.badgePill">{{ 100 - Number(failureRate) }}% Success</span>
+					<span :class="$style.badgeText">Execution reliability</span>
 				</div>
 			</div>
 
@@ -520,7 +500,7 @@ onBeforeUnmount(() => {
 				</div>
 				<div :class="$style.kpiValue">{{ timeSaved }}h</div>
 				<div :class="$style.kpiBadge">
-					<span :class="$style.badgeTextMuted">On Discuss</span>
+					<span :class="$style.badgeTextMuted">Automated runtime saved</span>
 				</div>
 			</div>
 		</div>
@@ -534,68 +514,20 @@ onBeforeUnmount(() => {
 				</div>
 				<div :class="$style.analyticsBody">
 					<div :class="$style.barChartContainer">
-						<!-- Sunday -->
-						<div :class="$style.barCol">
+						<div v-for="(dayStat, dIndex) in dayActivityStats" :key="dIndex" :class="$style.barCol">
 							<div :class="$style.barTrack">
 								<div
-									:class="[$style.barFill, $style.barFillStripedLight]"
-									style="height: 48%"
+									:class="[$style.barFill, $style[dayStat.styleClass]]"
+									:style="{ height: dayStat.height }"
+									:title="`${dayStat.label}: ${dayStat.count} events`"
 								></div>
 							</div>
-							<span :class="$style.dayLabel">S</span>
-						</div>
-						<!-- Monday -->
-						<div :class="$style.barCol">
-							<div :class="$style.barTrack">
-								<div :class="[$style.barFill, $style.barFillGreen]" style="height: 80%"></div>
-							</div>
-							<span :class="$style.dayLabel">M</span>
-						</div>
-						<!-- Tuesday -->
-						<div :class="$style.barCol">
-							<div :class="$style.barTrack">
-								<div :class="[$style.barFill, $style.barFillMint]" style="height: 65%"></div>
-							</div>
-							<span :class="$style.dayLabel">T</span>
-						</div>
-						<!-- Wednesday -->
-						<div :class="$style.barCol">
-							<div :class="$style.barTrack">
-								<div :class="[$style.barFill, $style.barFillDarkGreen]" style="height: 92%"></div>
-							</div>
-							<span :class="$style.dayLabel">W</span>
-						</div>
-						<!-- Thursday -->
-						<div :class="$style.barCol">
-							<div :class="$style.barTrack">
-								<div
-									:class="[$style.barFill, $style.barFillStripedLight]"
-									style="height: 82%"
-								></div>
-							</div>
-							<span :class="$style.dayLabel">T</span>
-						</div>
-						<!-- Friday -->
-						<div :class="$style.barCol">
-							<div :class="$style.barTrack">
-								<div :class="[$style.barFill, $style.barFillFlatLight]" style="height: 8%"></div>
-							</div>
-							<span :class="$style.dayLabel">F</span>
-						</div>
-						<!-- Saturday -->
-						<div :class="$style.barCol">
-							<div :class="$style.barTrack">
-								<div
-									:class="[$style.barFill, $style.barFillStripedLight]"
-									style="height: 82%"
-								></div>
-							</div>
-							<span :class="$style.dayLabel">S</span>
+							<span :class="$style.dayLabel">{{ dayStat.day }}</span>
 						</div>
 					</div>
-					<!-- 74% Tooltip Pill -->
+					<!-- Tooltip Pill -->
 					<div :class="$style.analyticsStatBadge">
-						<span :class="$style.statPercent">74%</span>
+						<span :class="$style.statPercent">{{ overallActivityRate }}</span>
 					</div>
 				</div>
 			</div>
@@ -603,9 +535,13 @@ onBeforeUnmount(() => {
 			<!-- Credentials List -->
 			<div :class="$style.widgetCard">
 				<div :class="$style.widgetHeader">
-					<span :class="$style.widgetTitle">Credentials</span>
+					<span :class="$style.widgetTitle">Credentials ({{ allRealCredentials.length }})</span>
 					<div :class="$style.headerActionsSmall">
-						<button :class="$style.viewAllBtn" @click="openModalView('credentials')">
+						<button
+							v-if="allRealCredentials.length > 0"
+							:class="$style.viewAllBtn"
+							@click="openModalView('credentials')"
+						>
 							View All
 						</button>
 						<button :class="$style.newBadgeBtn" @click="onNewCredential">+ New</button>
@@ -632,15 +568,29 @@ onBeforeUnmount(() => {
 							</div>
 						</div>
 					</div>
+					<!-- Clean Real Empty State -->
+					<div v-if="allRealCredentials.length === 0" :class="$style.cardEmptyState">
+						<N8nIcon icon="key" size="medium" :class="$style.emptyStateIcon" />
+						<span :class="$style.emptyStateText">No credentials created yet</span>
+						<button :class="$style.emptyStateActionBtn" @click="onNewCredential">
+							Create Credential
+						</button>
+					</div>
 				</div>
 			</div>
 
 			<!-- Workflows List -->
 			<div :class="[$style.widgetCard, $style.workflowsWidget]">
 				<div :class="$style.widgetHeader">
-					<span :class="$style.widgetTitle">Workflows</span>
+					<span :class="$style.widgetTitle">Workflows ({{ allRealWorkflows.length }})</span>
 					<div :class="$style.headerActionsSmall">
-						<button :class="$style.viewAllBtn" @click="openModalView('workflows')">View All</button>
+						<button
+							v-if="allRealWorkflows.length > 0"
+							:class="$style.viewAllBtn"
+							@click="openModalView('workflows')"
+						>
+							View All
+						</button>
 						<button :class="$style.newBadgeBtn" @click="onAddWorkflow">+ New</button>
 					</div>
 				</div>
@@ -662,6 +612,14 @@ onBeforeUnmount(() => {
 							<span :class="$style.wfDate">{{ wf.date }}</span>
 						</div>
 					</div>
+					<!-- Clean Real Empty State -->
+					<div v-if="allRealWorkflows.length === 0" :class="$style.cardEmptyState">
+						<N8nIcon icon="project-diagram" size="medium" :class="$style.emptyStateIcon" />
+						<span :class="$style.emptyStateText">No workflows created yet</span>
+						<button :class="$style.emptyStateActionBtn" @click="onAddWorkflow">
+							Create Workflow
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -671,8 +629,14 @@ onBeforeUnmount(() => {
 			<!-- Executions Widget -->
 			<div :class="$style.widgetCard">
 				<div :class="$style.widgetHeader">
-					<span :class="$style.widgetTitle">Executions</span>
-					<button :class="$style.viewAllBtn" @click="openModalView('executions')">View All</button>
+					<span :class="$style.widgetTitle">Executions ({{ allRealExecutions.length }})</span>
+					<button
+						v-if="allRealExecutions.length > 0"
+						:class="$style.viewAllBtn"
+						@click="openModalView('executions')"
+					>
+						View All
+					</button>
 				</div>
 				<div :class="$style.executionsList">
 					<div
@@ -696,6 +660,11 @@ onBeforeUnmount(() => {
 							</span>
 						</div>
 					</div>
+					<!-- Clean Real Empty State -->
+					<div v-if="allRealExecutions.length === 0" :class="$style.cardEmptyState">
+						<N8nIcon icon="history" size="medium" :class="$style.emptyStateIcon" />
+						<span :class="$style.emptyStateText">No executions recorded yet</span>
+					</div>
 				</div>
 			</div>
 
@@ -708,7 +677,7 @@ onBeforeUnmount(() => {
 					<!-- Semi-circle Gauge SVG -->
 					<div :class="$style.gaugeWrapper">
 						<svg viewBox="0 0 160 90" :class="$style.gaugeSvg">
-							<!-- Background arc (Dark Green - In Progress) -->
+							<!-- Background arc (Dark Green - Total/Inactive) -->
 							<path
 								d="M 20 80 A 60 60 0 0 1 140 80"
 								fill="none"
@@ -716,9 +685,9 @@ onBeforeUnmount(() => {
 								stroke-width="16"
 								stroke-linecap="round"
 							/>
-							<!-- Completed arc (Teal Green - Completed 41%) -->
+							<!-- Completed arc (Teal Green - Active workflows) -->
 							<path
-								d="M 20 80 A 60 60 0 0 1 85 22"
+								:d="projectProgressData.arcPath"
 								fill="none"
 								stroke="#228358"
 								stroke-width="16"
@@ -726,19 +695,23 @@ onBeforeUnmount(() => {
 							/>
 						</svg>
 						<div :class="$style.gaugeTextOverlay">
-							<span :class="$style.gaugePercentage">41%</span>
-							<span :class="$style.gaugeLabel">Project Ended</span>
+							<span :class="$style.gaugePercentage">{{ projectProgressData.percentage }}%</span>
+							<span :class="$style.gaugeLabel">Active Workflows</span>
 						</div>
 					</div>
 					<!-- Legend -->
 					<div :class="$style.gaugeLegend">
 						<div :class="$style.legendItem">
 							<span :class="[$style.legendDot, $style.legendDotGreen]"></span>
-							<span :class="$style.legendText">Completed</span>
+							<span :class="$style.legendText"
+								>Active ({{ projectProgressData.completedCount }})</span
+							>
 						</div>
 						<div :class="$style.legendItem">
 							<span :class="[$style.legendDot, $style.legendDotDark]"></span>
-							<span :class="$style.legendText">In Progress</span>
+							<span :class="$style.legendText"
+								>Inactive ({{ projectProgressData.inProgressCount }})</span
+							>
 						</div>
 					</div>
 				</div>
@@ -782,7 +755,7 @@ onBeforeUnmount(() => {
 					<span :class="$style.clockNumbers">{{ serverTime }}</span>
 				</div>
 
-				<!-- Control Action Buttons (Pause & Stop) -->
+				<!-- Control Action Buttons (Pause & Reset) -->
 				<div :class="$style.serverControls">
 					<button
 						:class="$style.controlBtnWhite"
@@ -1587,6 +1560,46 @@ onBeforeUnmount(() => {
 	border-color: #fecaca;
 }
 
+/* Real Empty State in cards */
+.cardEmptyState {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 24px 12px;
+	text-align: center;
+	background: #fafbfc;
+	border: 1px dashed #e2e8f0;
+	border-radius: 12px;
+}
+
+.emptyStateIcon {
+	color: #cbd5e1;
+	margin-bottom: 8px;
+}
+
+.emptyStateText {
+	font-size: 12px;
+	color: #94a3b8;
+	font-weight: 500;
+	margin-bottom: 8px;
+}
+
+.emptyStateActionBtn {
+	background: #0e3a2f;
+	color: #fff;
+	border: none;
+	border-radius: 12px;
+	padding: 5px 12px;
+	font-size: 11px;
+	font-weight: 600;
+	cursor: pointer;
+
+	&:hover {
+		background: #082820;
+	}
+}
+
 /* Project Progress Gauge */
 .progressBody {
 	display: flex;
@@ -1987,5 +2000,43 @@ onBeforeUnmount(() => {
 	padding: 32px 0;
 	color: #94a3b8;
 	font-size: 13px;
+}
+
+/* Full Responsive Breakdown */
+@media (max-width: 1200px) {
+	.kpiGrid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.middleGrid,
+	.bottomGrid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 768px) {
+	.dashboardContainer {
+		padding: 16px;
+	}
+
+	.topHeader {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 12px;
+	}
+
+	.searchWrapper {
+		width: 100%;
+	}
+
+	.kpiGrid {
+		grid-template-columns: 1fr;
+	}
+
+	.titleBar {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
 }
 </style>
