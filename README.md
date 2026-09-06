@@ -1,73 +1,121 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+<div align="center">
 
-# n8n – The Platform for AI Agents and Workflow Automation
+# ✨ AETHERA
+### Next-Generation Autonomous AI Agent & Workflow Orchestration Platform
 
-Fair-code platform to build and deploy AI agents and workflows. Combine a visual canvas with custom code, run it self-hosted or in the [cloud](https://app.n8n.cloud/login), and connect to 1500+ integrations. AI automation you can trust with real work, from prototype to production.
+<p align="center">
+  <img src="https://img.shields.io/badge/AETHERA-v1.0.0-ff4d6d?style=for-the-badge&logo=rocket&logoColor=white" alt="Version" />
+  <img src="https://img.shields.io/badge/Architecture-AI--Native-7928CA?style=for-the-badge&logo=openai&logoColor=white" alt="AI Native" />
+  <img src="https://img.shields.io/badge/Theme-Modern%20Dark%20Glass-00DFD8?style=for-the-badge" alt="Dark Glass" />
+  <img src="https://img.shields.io/badge/License-Proprietary%20%2F%20Custom-0070F3?style=for-the-badge" alt="License" />
+</p>
 
-![n8n.io - Screenshot](https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-screenshot-readme.png)
+<p align="center">
+  <b>Aethera</b> empowers developers, teams, and enterprises to build, automate, and deploy autonomous AI agents and intelligent workflows with absolute control, unmatched performance, and complete self-hosted privacy.
+</p>
 
-## Key Capabilities
+---
 
-- **AI-Native Automation Platform**: Build and operationalize AI workflows and multi-step agents using your own data, models, and tools
-- **Model Flexibility, No Lock-In**: Connect to OpenAI, Anthropic, Google, or open-source models and switch providers without changing your architecture
-- **From Prototype to Production**: Design multi-step AI workflows with logic, tool use, human approvals, and full observability
-- **Code When You Need It**: Combine visual building with JavaScript, Python, and npm packages for advanced AI workflows
-- **Enterprise-Ready AI**: Self-host or deploy securely with role-based access, audit trails, and support for sensitive data
-- **Leverage What Already Exists**: 1500+ integrations and 9,000+ workflow [templates](https://n8n.io/workflows) to connect AI with your existing systems
+</div>
 
-## Quick Start
+## 🌌 Overview
 
-Try n8n instantly with our install script (requires [Docker](https://www.docker.com/)):
+**Aethera** is an enterprise-grade AI automation and orchestration ecosystem built from the ground up to connect custom LLM agents, complex multi-step reasoning architectures, APIs, and databases into seamless, self-healing pipelines.
 
-```sh
-curl -fsSL https://get.n8n.io | sh
+Featuring an ultra-modern **Dark Glass UI**, native agent sandboxes, granular execution monitoring, and dynamic node styling, Aethera delivers a top-tier developer and operational experience.
+
+---
+
+## ⚡ Key Highlights & Capabilities
+
+- 🤖 **Autonomous AI Multi-Agent Networks**: Design and orchestrate agent clusters using OpenAI, Anthropic Claude, Google Gemini, Ollama, and local open-source LLMs with zero vendor lock-in.
+- 🎨 **Modern Dark Glass Interface**: Fully bespoke cybernetic UI featuring floating glass dock navigation, luminescent category status badges, and enhanced canvas contrast.
+- ⚡ **High-Throughput Distributed Engine**: Event-driven execution engine capable of parallel node executions, dynamic retries, and sub-millisecond data routing.
+- 🛡️ **Zero-Telemetry & Absolute Privacy**: Hardened self-hosted architecture with all outbound third-party analytics and phone-home telemetry strictly severed.
+- 🔌 **1500+ Ecosystem Integrations**: Seamlessly integrate CRM, ERP, message queues, databases, cloud providers, and custom REST/GraphQL services.
+- 💻 **Full-Spectrum Code Flexibility**: Combine visual node modeling with custom JavaScript, Python, TypeScript, and external packages when complex transformations are needed.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (>= 20.x)
+- [pnpm](https://pnpm.io/) (>= 9.x)
+- [Docker](https://www.docker.com/) (Optional for containerized deployments)
+
+### 1. Clone & Setup
+```bash
+# Clone the repository
+git clone https://github.com/RukshanAmodya/Aethera.git
+cd Aethera
+
+# Install monorepo dependencies
+pnpm install
 ```
 
-Or deploy manually with [Docker](https://docs.n8n.io/hosting/installation/docker/):
-
-```
-docker volume create n8n_data
-docker run -it --rm --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n
+### 2. Build the Platform
+```bash
+pnpm build
 ```
 
-Access the editor at http://localhost:5678
+### 3. Run in Development Mode
+```bash
+# Start backend server
+pnpm dev:be
 
-## Resources
+# In another terminal, start frontend UI
+pnpm dev:fe:editor
+```
 
-- 📚 [Documentation](https://docs.n8n.io)
-- 🔧 [1500+ Integrations](https://n8n.io/integrations)
-- 💡 [Example Workflows](https://n8n.io/workflows)
-- 🤖 [AI & LangChain Guide](https://docs.n8n.io/advanced-ai/)
-- 👥 [Community Forum](https://community.n8n.io)
-- 📖 [Community Tutorials](https://community.n8n.io/c/tutorials/28)
+Access the **Aethera Dashboard** at `http://localhost:8080` (Frontend) / `http://localhost:5678` (API Gateway).
 
-## Support
+---
 
-Need help? Our community forum is the place to get support and connect with other users:
-[community.n8n.io](https://community.n8n.io)
+## 🏗️ Architecture
 
-## License
+Aethera is architected as a high-performance TypeScript monorepo powered by pnpm workspaces:
 
-n8n is [fair-code](https://faircode.io) distributed under the [Sustainable Use License](https://github.com/n8n-io/n8n/blob/master/LICENSE.md) and [n8n Enterprise License](https://github.com/n8n-io/n8n/blob/master/LICENSE_EE.md).
+```
+Aethera/
+├── packages/
+│   ├── @n8n/api-types/       # Shared TypeScript schemas & DTOs
+│   ├── @n8n/config/          # Core configuration & environment registry
+│   ├── @n8n/design-system/   # Custom UI component library & design tokens
+│   ├── @n8n/nodes-langchain/ # AI Agent & LangChain reasoning nodes
+│   ├── cli/                  # Backend REST API, execution engine & workers
+│   ├── core/                 # Graph compilation & execution runner
+│   ├── frontend/editor-ui/   # Vue 3 + Vite high-performance canvas UI
+│   ├── nodes-base/           # 1500+ Built-in integration nodes
+│   └── workflow/             # Workflow graph schema & serialization
+```
 
-- **Source Available**: Always visible source code
-- **Self-Hostable**: Deploy anywhere
-- **Extensible**: Add your own nodes and functionality
+---
 
-[Enterprise Licenses](mailto:license@n8n.io) available for additional features and support.
+## 🎨 Design Philosophy & Customization
 
-Additional information about the license model can be found in the [docs](https://docs.n8n.io/sustainable-use-license/).
+Aethera is crafted with a focus on ergonomics, clarity, and visual precision:
+- **Floating Island Dock**: Centralized navigation dock with responsive sub-panels.
+- **Vibrant Node Accent Badges**: AI (Purple), Triggers (Cyan), Logic (Amber), Data (Blue), Scripts (Gold).
+- **Execution Telemetry**: Real-time per-node latency counters and live status indicators.
 
-## Contributing
+---
 
-Found a bug 🐛 or have a feature idea ✨? Check our [Contributing Guide](https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md) for a setup guide & best practices.
+## 🛡️ Security & Privacy First
 
-## Join the Team
+- **Isolated Execution**: Execute scripts and tools in isolated worker sandboxes.
+- **Air-Gapped Ready**: Operates completely offline without dependency on external licensing or tracking servers.
+- **RBAC & Project Scopes**: Comprehensive role-based access control for teams and organizations.
 
-Want to shape the future of automation? Check out our [job posts](https://n8n.io/careers) and join our team!
+---
 
-## What does n8n mean?
+## 🤝 Community & Support
 
-**Short answer:** It means "nodemation" and is pronounced as n-eight-n.
+- 🌐 **Project Home**: [Aethera Ecosystem](https://github.com/RukshanAmodya/Aethera)
+- 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/RukshanAmodya/Aethera/issues)
 
-**Long answer:** "I get that question quite often (more often than I expected) so I decided it is probably best to answer it here. While looking for a good name for the project with a free domain I realized very quickly that all the good ones I could think of were already taken. So, in the end, I chose nodemation. 'node-' in the sense that it uses a Node-View and that it uses Node.js and '-mation' for 'automation' which is what the project is supposed to help with. However, I did not like how long the name was and I could not imagine writing something that long every time in the CLI. That is when I then ended up on 'n8n'." - **Jan Oberhauser, Founder and CEO, n8n.io**
+---
+
+<div align="center">
+  <sub>Engineered with precision for the next era of Autonomous Intelligence.</sub>
+</div>
